@@ -6,9 +6,12 @@
 #include <float.h>
 
 #include <vector>
+#include <numeric>
+#include <cmath>
 
-#include <random>
 #include <cstdint>
+
+// #include "../fps/fps.hpp"
 
 // 立方体
 struct Solid

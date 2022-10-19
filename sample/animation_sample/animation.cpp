@@ -56,14 +56,20 @@ std::vector<std::vector<GLfloat>> Solid::getNormal()
 {
     for (int i = 0; i < quadEdge.size(); i++)
     {
-        normal.push_back({ (vertex.at(quadEdge.at(i).at(0)).at(0) +  vertex.at(quadEdge.at(i).at(1)).at(0) +  vertex.at(quadEdge.at(i).at(2)).at(0) +  vertex.at(quadEdge.at(i).at(3)).at(0))/4 - 0.5,
-        (vertex.at(quadEdge.at(i).at(0)).at(1) +  vertex.at(quadEdge.at(i).at(1)).at(1) +  vertex.at(quadEdge.at(i).at(2)).at(1) +  vertex.at(quadEdge.at(i).at(3)).at(1))/4 - 0.5,
-        (vertex.at(quadEdge.at(i).at(0)).at(2) +  vertex.at(quadEdge.at(i).at(1)).at(2) +  vertex.at(quadEdge.at(i).at(2)).at(2) +  vertex.at(quadEdge.at(i).at(3)).at(2))/4 - 0.5 });
+        normal.push_back({(vertex.at(quadEdge.at(i).at(0)).at(0) + vertex.at(quadEdge.at(i).at(1)).at(0) + vertex.at(quadEdge.at(i).at(2)).at(0) + vertex.at(quadEdge.at(i).at(3)).at(0)) / 4.f - (float)0.5,
+                          (vertex.at(quadEdge.at(i).at(0)).at(1) + vertex.at(quadEdge.at(i).at(1)).at(1) + vertex.at(quadEdge.at(i).at(2)).at(1) + vertex.at(quadEdge.at(i).at(3)).at(1)) / 4.f - (float)0.5,
+                          (vertex.at(quadEdge.at(i).at(0)).at(2) + vertex.at(quadEdge.at(i).at(1)).at(2) + vertex.at(quadEdge.at(i).at(2)).at(2) + vertex.at(quadEdge.at(i).at(3)).at(2)) / 4.f - (float)0.5});
     }
 
-    for(auto &f:normal){
-        for(auto &e:f) e =/ std::accumulate(f.begin(),f.end(),0);
-    } 
+    for (auto &f : normal)
+    {
+        float e = std::sqrt( std::accumulate(f.begin(), f.end(),0.f, [](float acc, float i){ return acc + i * i; }));
+
+        f.at(0) /= e;
+        f.at(1) /= e;
+        f.at(2) /= e;
+    }
+
     return normal;
 }
 

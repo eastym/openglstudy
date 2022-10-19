@@ -27,12 +27,8 @@ T1 indexSearch(std::vector<T2> &x, int y)
 }
 
 template <typename T>
-void createSolid(std::vector<std::vector<T>> vertex, std::vector<std::vector<T>> edge,std::vector<std::vector<T>> normal, std::vector<std::vector<T>> color)
+void createSolid(std::vector<std::vector<T>> vertex, std::vector<std::vector<T>> edge, std::vector<std::vector<T>> normal, std::vector<std::vector<T>> color)
 {
-    GLfloat R, G, B;
-
-    std::random_device seed_gen;
-    std::mt19937 engine(seed_gen());
 
     glLineWidth(5);
 
@@ -40,12 +36,9 @@ void createSolid(std::vector<std::vector<T>> vertex, std::vector<std::vector<T>>
 
     for (int i = 0; i < edge.size(); ++i)
     {
-        R = GLfloat(engine()) / GLfloat(UINT32_MAX);
-        G = GLfloat(engine()) / GLfloat(UINT32_MAX);
-        B = GLfloat(engine()) / GLfloat(UINT32_MAX);
 
         glColor3fv(color.at(i).data());
-       // glNormal3fv(normal.at(i).data());
+        glNormal3fv(normal.at(i).data());
         glVertex3fv(indexSearch<T *, T>(vertex.at(edge.at(i).at(0)), 0));
         glVertex3fv(indexSearch<T *, T>(vertex.at(edge.at(i).at(1)), 0));
         glVertex3fv(indexSearch<T *, T>(vertex.at(edge.at(i).at(2)), 0));
@@ -53,6 +46,12 @@ void createSolid(std::vector<std::vector<T>> vertex, std::vector<std::vector<T>>
     }
 
     glEnd();
+}
+
+void timer(int i)
+{
+    idle();
+    glutTimerFunc(10, timer, 0);
 }
 
 int main(int argc, char *argv[])
@@ -69,6 +68,8 @@ int main(int argc, char *argv[])
     glutMotionFunc(motion);
     glutKeyboardFunc(keyboard);
     initColor();
+    glutTimerFunc(10, timer, 0);
+
     glutMainLoop();
     return 0;
 }
@@ -78,32 +79,38 @@ void initColor()
     glClearColor(1.0, 1.0, 1.0, 1.0);
 
     std::vector<GLfloat> position = {0, 0, 10.0, 0.0 /*0.0 の時、平行光源*/};
-    std::vector<GLfloat> diffuse = {0.5, 0, 0, 1.0};
-    std::vector<GLfloat> specular = {0.5, 0.0, 0.0, 1.0};
-    std::vector<GLfloat> ambient = {0, 0.0, 0.0, 1.0};
+    std::vector<GLfloat> diffuse = {1.0, 0, 0, 1.0};
+    std::vector<GLfloat> specular = {0, 0.0, 0.0, 1.0};
+    std::vector<GLfloat> ambient = {0.2, 0.0, 0.0, 1.0};
 
     glLightfv(GL_LIGHT0, GL_POSITION, position.data());
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse.data());   // 拡散反射成分の色 　sub
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular.data()); // 鏡面反射成分の色 nothing
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient.data());   // 環境光成分の色　light original color
 
-    diffuse = {0, 0.5, 0, 1.0};
+    diffuse = {0, 1.0, 0, 1.0};
     specular = {0, 0, 0, 1.0};
-    ambient = {0, 0.5, 0, 1.0};
+    ambient = {0, 0.2, 0, 1.0};
 
     glLightfv(GL_LIGHT1, GL_POSITION, position.data());
     glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse.data());   // 拡散反射成分の色
     glLightfv(GL_LIGHT1, GL_SPECULAR, specular.data()); // 鏡面反射成分の色
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambient.data());   // 環境光成分の色
 
-    diffuse = {0, 0, 0, 1.0};
-    specular = {0, 0, 0.5, 1.0};
-    ambient = {0, 0, 0.5, 1.0};
+    diffuse = {0, 0, 1.0, 1.0};
+    specular = {0, 0, 0, 1.0};
+    ambient = {0, 0, 0.2, 1.0};
 
     glLightfv(GL_LIGHT2, GL_POSITION, position.data());
     glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuse.data());   // 拡散反射成分の色
     glLightfv(GL_LIGHT2, GL_SPECULAR, specular.data()); // 鏡面反射成分の色
     glLightfv(GL_LIGHT2, GL_AMBIENT, ambient.data());   // 環境光成分の色
+
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHTING);
+
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
 
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
@@ -129,12 +136,16 @@ void display()
     x += point[2] - point[0];
     y += point[3] - point[1];
 
+    for (auto &e : point)
+        std::cout << e << "\t";
+    std::cout << std::endl;
+
     glMatrixMode(GL_MODELVIEW); // ワールド座標-> カメラ座標　変換行列
 
     glRotated(static_cast<double>(x), 0.0, 1.0, 0.0);
     glRotated(static_cast<double>(y), 1.0, 0.0, 0.0);
 
-    createSolid<GLfloat>(solid.getVertex(), solid.getQuadEdge(),solid.getNormal(), solid.getQuadColor());
+    createSolid<GLfloat>(solid.getVertex(), solid.getQuadEdge(), solid.getNormal(), solid.getQuadColor());
 
     glutSwapBuffers();
     // glFlush();
@@ -178,11 +189,12 @@ void mouse(int button, int state, int x, int y)
     switch (button)
     {
     case GLUT_LEFT_BUTTON:
-        point[0] = point[2] = x / 100;
-        point[1] = point[3] = y / 100;
+
         if (state == GLUT_DOWN)
         {
             glutIdleFunc(idle);
+            point[0] = point[2] = x / 100;
+            point[1] = point[3] = y / 100;
         }
         else
         {
@@ -193,13 +205,13 @@ void mouse(int button, int state, int x, int y)
     case GLUT_RIGHT_BUTTON:
         if (state == GLUT_DOWN)
         {
-            glutPostRedisplay();
         }
         break;
 
     default:
         break;
     }
+    glutPostRedisplay();
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -290,4 +302,18 @@ void motion(int x, int y)
 
 カメラの画角などのパラメータを変更しなければ, 透視変換行列を設定しなければならないのはウィンドウを開いたときだけなので, これは resize() で設定すればよいでしょう. あとは全てモデリング−ビューイング変換行列に対する操作なので, 直後に glMatrixMode(GL_MODELVIEW) を実行します.
 
-カメラ (視点) の位置を動かすアニメーションを行う場合は, 描画のたびに gluLookAt() によるカメラの位置や方向の設定 (ビューイング変換行列の設定) を行う必要があります. 同様に物体が移動したり回転したりするアニメーションを行う場合も, 描画のたびに物体の位置や回転角の設定 (モデリング変換行列の設定) を 行う必要があります. したがって, これらは display() の中で設定します.*/
+カメラ (視点) の位置を動かすアニメーションを行う場合は, 描画のたびに gluLookAt() によるカメラの位置や方向の設定 (ビューイング変換行列の設定) を行う必要があります. 同様に物体が移動したり回転したりするアニメーションを行う場合も, 描画のたびに物体の位置や回転角の設定 (モデリング変換行列の設定) を 行う必要があります. したがって, これらは display() の中で設定します.
+
+ライティング処理は，モデルビュー変換行列モードで行われるので，glLightfv() による光源の位置 (GL_POSITION) の設定は，視点の位置を設定した後に行う必要があります． また，上のプログラムの glRotate3d() より後でこれを設定すると，光源もいっしょに回転します．
+
+5.1 節で，座標変換のプロセスは，
+
+モデリング変換
+ビューイング（視野）変換
+投影変換
+ビューポート変換
+という４つのステップで行わると書きましたが， プログラムのコーディング上は，これらの設定が次のように逆順になることに注意してください．
+glLoadIdentity() でモデルビュー変換行列を初期化
+gluLookAt()やglFrustum() 等でビューイング変換を設定
+glTranslated() や glRotated() 等でモデリング変換を設定
+glBegin()～glEnd() 等による描画*/
