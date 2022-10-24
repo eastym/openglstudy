@@ -1,3 +1,5 @@
+#pragma once
+
 #include <GL/glut.h>
 
 #include <iostream>
@@ -8,6 +10,7 @@
 #include <vector>
 #include <numeric>
 #include <cmath>
+#include <algorithm>
 
 #include <cstdint>
 
