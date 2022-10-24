@@ -1,3 +1,4 @@
+#include <GL/gl.h>
 #include "animation.hpp"
 
 #define window_w 1000
@@ -48,10 +49,20 @@ void createSolid(std::vector<std::vector<T>> vertex, std::vector<std::vector<T>>
     glEnd();
 }
 
+void lighton(std::vector<int> target){
+    for(int light = 0;light <= GL_LIGHT7 - GL_LIGHT0;light++){
+        if(std::ranges::find_if(target,[light](int x){ return x == light;}) != target.end()){
+            glEnable(GL_LIGHT0 + light);
+        }else{
+            glDisable(GL_LIGHT0 + light);
+        }
+    }
+}
+
 void timer(int i)
 {
     idle();
-    glutTimerFunc(10, timer, 0);
+    glutTimerFunc(16, timer, 0);
 }
 
 int main(int argc, char *argv[])
@@ -106,8 +117,14 @@ void initColor()
     glLightfv(GL_LIGHT2, GL_SPECULAR, specular.data()); // 鏡面反射成分の色
     glLightfv(GL_LIGHT2, GL_AMBIENT, ambient.data());   // 環境光成分の色
 
-    glEnable(GL_LIGHT1);
-    glEnable(GL_LIGHTING);
+    diffuse = {1.0, 1.0, 1.0, 1.0};
+    specular = {0, 0, 0, 1.0};
+    ambient = {0.2, 0.2, 0.2, 1.0};
+
+    glLightfv(GL_LIGHT3, GL_POSITION, position.data());
+    glLightfv(GL_LIGHT3, GL_DIFFUSE, diffuse.data());   // 拡散反射成分の色
+    glLightfv(GL_LIGHT3, GL_SPECULAR, specular.data()); // 鏡面反射成分の色
+    glLightfv(GL_LIGHT3, GL_AMBIENT, ambient.data());   // 環境光成分の色
 
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
@@ -228,6 +245,8 @@ void keyboard(unsigned char key, int x, int y)
         glEnable(GL_LIGHTING);
 
         glEnable(GL_LIGHT0);
+
+        glDisable(GL_LIGHT3);
         glDisable(GL_LIGHT1);
         glDisable(GL_LIGHT2);
         break;
@@ -235,15 +254,19 @@ void keyboard(unsigned char key, int x, int y)
         glEnable(GL_LIGHTING);
 
         glEnable(GL_LIGHT1);
+
         glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHT3);
         glDisable(GL_LIGHT2);
         break;
     case 'b':
         glEnable(GL_LIGHTING);
 
         glEnable(GL_LIGHT2);
-        glDisable(GL_LIGHT1);
+
         glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHT1);
+        glDisable(GL_LIGHT3);
         break;
     case 'o':
         glEnable(GL_LIGHTING);
@@ -256,9 +279,11 @@ void keyboard(unsigned char key, int x, int y)
     case 'w':
         glEnable(GL_LIGHTING);
 
-        glEnable(GL_LIGHT0);
-        glEnable(GL_LIGHT1);
-        glEnable(GL_LIGHT2);
+        glEnable(GL_LIGHT3);
+
+        glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHT1);
+        glDisable(GL_LIGHT2);
         break;
 
     case 'p':

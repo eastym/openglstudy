@@ -1,6 +1,6 @@
 CC = g++
 
-CFLAGS = -Wall -Weffc++ -g
+CFLAGS =  -Wall -Weffc++ -g -std=c++20
 
 PROGRAM = animation
 
