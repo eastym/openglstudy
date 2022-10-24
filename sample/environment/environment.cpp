@@ -162,3 +162,5 @@ Emission: 放射光
 
     glClearColor(0.5, 0.5, 0.1, 0.0);
 }
+
+// first apple juice
