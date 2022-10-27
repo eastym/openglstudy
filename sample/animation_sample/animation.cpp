@@ -54,7 +54,7 @@ std::vector<std::vector<GLfloat>> Solid::getVertex()
 
 std::vector<std::vector<GLfloat>> Solid::getNormal()
 {
-    for (int i = 0; i < quadEdge.size(); i++)
+    for (auto i = 0u; i < quadEdge.size(); i++)
     {
         normal.push_back({(vertex.at(quadEdge.at(i).at(0)).at(0) + vertex.at(quadEdge.at(i).at(1)).at(0) + vertex.at(quadEdge.at(i).at(2)).at(0) + vertex.at(quadEdge.at(i).at(3)).at(0)) / 4.f - (float)0.5,
                           (vertex.at(quadEdge.at(i).at(0)).at(1) + vertex.at(quadEdge.at(i).at(1)).at(1) + vertex.at(quadEdge.at(i).at(2)).at(1) + vertex.at(quadEdge.at(i).at(3)).at(1)) / 4.f - (float)0.5,
@@ -73,12 +73,12 @@ std::vector<std::vector<GLfloat>> Solid::getNormal()
     return normal;
 }
 
-std::vector<std::vector<GLfloat>> Solid::getLinesEdge()
+std::vector<std::vector<GLint>> Solid::getLinesEdge()
 {
     return Solid::linesEdge;
 }
 
-std::vector<std::vector<GLfloat>> Solid::getQuadEdge()
+std::vector<std::vector<GLint>> Solid::getQuadEdge()
 {
     return Solid::quadEdge;
 }

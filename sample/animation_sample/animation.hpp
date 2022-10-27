@@ -2,6 +2,7 @@
 
 #include <GL/glut.h>
 
+
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,13 +18,13 @@
 // #include "../fps/fps.hpp"
 
 // 立方体
-struct Solid
+class Solid
 {
 private:
     std::vector<std::vector<GLfloat>> vertex;
     std::vector<std::vector<GLfloat>> normal;
-    std::vector<std::vector<GLfloat>> linesEdge;
-    std::vector<std::vector<GLfloat>> quadEdge;
+    std::vector<std::vector<GLint>> linesEdge;
+    std::vector<std::vector<GLint>> quadEdge;
     std::vector<std::vector<GLfloat>> quadColor;
 
     std::vector<GLdouble> rotate;
@@ -36,8 +37,8 @@ public:
     void setVertex(std::vector<GLfloat> center, GLfloat width, GLfloat height, GLfloat depth);
     std::vector<std::vector<GLfloat>> getVertex();
     std::vector<std::vector<GLfloat>> getNormal();
-    std::vector<std::vector<GLfloat>> getLinesEdge();
-    std::vector<std::vector<GLfloat>> getQuadEdge();
+    std::vector<std::vector<GLint>> getLinesEdge();
+    std::vector<std::vector<GLint>> getQuadEdge();
     std::vector<std::vector<GLfloat>> getQuadColor();
 
     void doRotate(double x, double y, double z);
