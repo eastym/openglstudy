@@ -1,4 +1,3 @@
-#include <GL/gl.h>
 #include "animation.hpp"
 
 #define window_w 1000
