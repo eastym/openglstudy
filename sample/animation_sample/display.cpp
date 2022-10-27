@@ -28,32 +28,38 @@ T1 indexSearch(std::vector<T2> &x, int y)
 }
 
 template <typename T>
-void createSolid(std::vector<std::vector<T>> vertex, std::vector<std::vector<T>> edge, std::vector<std::vector<T>> normal, std::vector<std::vector<T>> color)
+void createSolid(Solid target)
 {
-
-    glLineWidth(5);
-
-    glBegin(GL_QUADS);
-
-    for (int i = 0; i < edge.size(); ++i)
+    for (auto i = 0u; i < target.getQuadEdge().size(); ++i)
     {
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+        glEnable(GL_COLOR_MATERIAL);
+        glColor3fv(target.getQuadColor().at(i).data());
 
-        glColor3fv(color.at(i).data());
-        glNormal3fv(normal.at(i).data());
-        glVertex3fv(indexSearch<T *, T>(vertex.at(edge.at(i).at(0)), 0));
-        glVertex3fv(indexSearch<T *, T>(vertex.at(edge.at(i).at(1)), 0));
-        glVertex3fv(indexSearch<T *, T>(vertex.at(edge.at(i).at(2)), 0));
-        glVertex3fv(indexSearch<T *, T>(vertex.at(edge.at(i).at(3)), 0));
+        // glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color.at(i).data());
+
+        glNormal3fv(target.getNormal().at(i).data());
+        glBegin(GL_QUADS);
+
+        glVertex3fv(target.getVertex().at(target.getQuadEdge().at(i).at(0)).data());
+        glVertex3fv(target.getVertex().at(target.getQuadEdge().at(i).at(1)).data());
+        glVertex3fv(target.getVertex().at(target.getQuadEdge().at(i).at(2)).data());
+        glVertex3fv(target.getVertex().at(target.getQuadEdge().at(i).at(3)).data());
+        glEnd();
     }
-
-    glEnd();
 }
 
-void lighton(std::vector<int> target){
-    for(int light = 0;light <= GL_LIGHT7 - GL_LIGHT0;light++){
-        if(std::ranges::find_if(target,[light](int x){ return x == light;}) != target.end()){
+void lighton(std::vector<int> target)
+{
+    for (int light = 0; light <= GL_LIGHT7 - GL_LIGHT0; light++)
+    {
+        if (std::ranges::find_if(target, [light](int x)
+                                 { return x == light; }) != target.cend())
+        {
             glEnable(GL_LIGHT0 + light);
-        }else{
+        }
+        else
+        {
             glDisable(GL_LIGHT0 + light);
         }
     }
@@ -126,18 +132,16 @@ void initColor()
     glLightfv(GL_LIGHT3, GL_SPECULAR, specular.data()); // 鏡面反射成分の色
     glLightfv(GL_LIGHT3, GL_AMBIENT, ambient.data());   // 環境光成分の色
 
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    glEnable(GL_COLOR_MATERIAL);
-
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
 }
 
 void display()
 {
-    Solid solid;
+    Solid solid, solidas;
 
     solid.setVertex({0.5, 0.5, 0.5}, 1.0, 1.0, 1.0);
+    solidas.setVertex({0.5, 0.5, 0.5}, 1.0, 1.0, 1.0);
 
     static int x = 0, y = 0;
 
@@ -162,10 +166,20 @@ void display()
     glRotated(static_cast<double>(x), 0.0, 1.0, 0.0);
     glRotated(static_cast<double>(y), 1.0, 0.0, 0.0);
 
-    createSolid<GLfloat>(solid.getVertex(), solid.getQuadEdge(), solid.getNormal(), solid.getQuadColor());
+    createSolid<GLfloat>(solid);
+
+    glPushMatrix();
+
+    glTranslated(1.0, 1.0, 1.0);
+    glRotated(static_cast<double>(x), 0.0, 1.0, 0.0);
+    glRotated(static_cast<double>(y), 1.0, 0.0, 0.0);
+
+    createSolid<GLfloat>(solidas);
+
+    glPopMatrix();
 
     glutSwapBuffers();
-    // glFlush();
+    glFlush();
     if (x >= 360)
     {
         x -= 360;
@@ -244,54 +258,35 @@ void keyboard(unsigned char key, int x, int y)
     case 'r':
         glEnable(GL_LIGHTING);
 
-        glEnable(GL_LIGHT0);
+        lighton({0});
 
-        glDisable(GL_LIGHT3);
-        glDisable(GL_LIGHT1);
-        glDisable(GL_LIGHT2);
         break;
     case 'g':
         glEnable(GL_LIGHTING);
 
-        glEnable(GL_LIGHT1);
-
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHT3);
-        glDisable(GL_LIGHT2);
+        lighton({1});
         break;
     case 'b':
         glEnable(GL_LIGHTING);
 
-        glEnable(GL_LIGHT2);
-
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHT1);
-        glDisable(GL_LIGHT3);
+        lighton({2});
         break;
     case 'o':
         glEnable(GL_LIGHTING);
 
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHT1);
-        glDisable(GL_LIGHT2);
+        lighton({0, 1, 2});
         break;
 
     case 'w':
         glEnable(GL_LIGHTING);
 
-        glEnable(GL_LIGHT3);
-
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHT1);
-        glDisable(GL_LIGHT2);
+        lighton({3});
         break;
 
     case 'p':
         glDisable(GL_LIGHTING);
 
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHT1);
-        glDisable(GL_LIGHT2);
+        lighton({});
         break;
     default:
         break;
