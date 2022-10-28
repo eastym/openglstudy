@@ -1,4 +1,3 @@
-#include <GL/gl.h>
 #include "animation.hpp"
 
 #define window_w 1000
@@ -14,6 +13,7 @@ void motion(int x, int y);
 
 std::vector<std::vector<GLint>> pl;
 std::vector<GLint> point(4);
+FPS fps(60);
 
 template <typename T1, typename T2>
 T1 indexSearch(std::vector<T2> &x, int y)
@@ -49,6 +49,34 @@ void createSolid(Solid target)
     }
 }
 
+void putObject(std::vector<Solid> shelf, int x, int y)
+{
+
+    for (auto &e : shelf)
+        e.setVertex({0.5, 0.5, 0.5}, 1.0, 1.0, 1.0);
+
+    glRotated(static_cast<double>(x), 0.0, 1.0, 0.0);
+    glRotated(static_cast<double>(y), 1.0, 0.0, 0.0);
+
+    createSolid<GLfloat>(shelf.at(0));
+
+    glPushMatrix();
+
+    for (auto i = 1; i < shelf.size(); i++)
+    {
+        glTranslated(1.0, 1.0, 1.0);
+        glRotated(static_cast<double>(x), 0.0, 1.0, 0.0);
+        glRotated(static_cast<double>(y), 1.0, 0.0, 0.0);
+
+        createSolid<GLfloat>(shelf.at(i));
+
+        glPushMatrix();
+    }
+
+    for (auto i = 0; i < shelf.size(); i++)
+        glPopMatrix();
+}
+
 void lighton(std::vector<int> target)
 {
     for (int light = 0; light <= GL_LIGHT7 - GL_LIGHT0; light++)
@@ -67,8 +95,9 @@ void lighton(std::vector<int> target)
 
 void timer(int i)
 {
-    idle();
-    glutTimerFunc(16, timer, 0);
+
+    fps.GetFPS(glutPostRedisplay);
+    glutTimerFunc(1, timer, 0);
 }
 
 int main(int argc, char *argv[])
@@ -85,7 +114,7 @@ int main(int argc, char *argv[])
     glutMotionFunc(motion);
     glutKeyboardFunc(keyboard);
     initColor();
-    glutTimerFunc(10, timer, 0);
+    glutTimerFunc(1, timer, 0);
 
     glutMainLoop();
     return 0;
@@ -138,10 +167,8 @@ void initColor()
 
 void display()
 {
-    Solid solid, solidas;
-
-    solid.setVertex({0.5, 0.5, 0.5}, 1.0, 1.0, 1.0);
-    solidas.setVertex({0.5, 0.5, 0.5}, 1.0, 1.0, 1.0);
+    static Solid solid, solidus, liquid, venom, naked, bahamut, alexander, omega, eden, pandemonium,
+        anima, asura, chocobo, hades, ixion, masamune, titan;
 
     static int x = 0, y = 0;
 
@@ -152,31 +179,14 @@ void display()
 
     glLoadIdentity();
 
-    gluLookAt(0.5, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0);
+    gluLookAt(0.5, 0.0, 50.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0);
 
     x += point[2] - point[0];
     y += point[3] - point[1];
 
-    for (auto &e : point)
-        std::cout << e << "\t";
-    std::cout << std::endl;
-
     glMatrixMode(GL_MODELVIEW); // ワールド座標-> カメラ座標　変換行列
 
-    glRotated(static_cast<double>(x), 0.0, 1.0, 0.0);
-    glRotated(static_cast<double>(y), 1.0, 0.0, 0.0);
-
-    createSolid<GLfloat>(solid);
-
-    glPushMatrix();
-
-    glTranslated(1.0, 1.0, 1.0);
-    glRotated(static_cast<double>(x), 0.0, 1.0, 0.0);
-    glRotated(static_cast<double>(y), 1.0, 0.0, 0.0);
-
-    createSolid<GLfloat>(solidas);
-
-    glPopMatrix();
+    putObject({naked,solid,liquid,solidus,venom,bahamut,alexander,omega,eden,pandemonium,anima,asura,chocobo,hades,ixion,masamune,titan},x,y);
 
     glutSwapBuffers();
     glFlush();
@@ -209,11 +219,6 @@ void resize(int w, int h)
     glMatrixMode(GL_MODELVIEW); /* マトリックスモードをモデルビューにする */
 }
 
-void idle()
-{
-    glutPostRedisplay();
-}
-
 void mouse(int button, int state, int x, int y)
 {
 
@@ -223,7 +228,6 @@ void mouse(int button, int state, int x, int y)
 
         if (state == GLUT_DOWN)
         {
-            glutIdleFunc(idle);
             point[0] = point[2] = x / 100;
             point[1] = point[3] = y / 100;
         }
@@ -242,7 +246,7 @@ void mouse(int button, int state, int x, int y)
     default:
         break;
     }
-    glutPostRedisplay();
+    // glutPostRedisplay();
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -291,7 +295,7 @@ void keyboard(unsigned char key, int x, int y)
     default:
         break;
     }
-    glutPostRedisplay();
+    // glutPostRedisplay();
 }
 
 void motion(int x, int y)

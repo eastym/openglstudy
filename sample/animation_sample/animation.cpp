@@ -2,6 +2,9 @@
 
 Solid::Solid()
 {
+    std::random_device seed_gen;
+    std::mt19937_64 engine(seed_gen());
+
     rotate = {0, 0, 0};
     linesEdge = {
         {0, 1},
@@ -26,12 +29,12 @@ Solid::Solid()
         {4, 7, 6, 5}};
 
     quadColor = {
-        {1, 0, 0},
-        {0, 1, 0},
-        {0, 0, 1},
-        {1, 1, 0},
-        {1, 0, 1},
-        {0, 1, 1}};
+        {(GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX)},
+        {(GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX)},
+        {(GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX)},
+        {(GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX)},
+        {(GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX)},
+        {(GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX), (GLfloat)(engine()) / (GLfloat)(UINT64_MAX)}};
 }
 
 // x:width y:height z:depth
@@ -63,7 +66,8 @@ std::vector<std::vector<GLfloat>> Solid::getNormal()
 
     for (auto &f : normal)
     {
-        float e = std::sqrt( std::accumulate(f.begin(), f.end(),0.f, [](float acc, float i){ return acc + i * i; }));
+        float e = std::sqrt(std::accumulate(f.begin(), f.end(), 0.f, [](float acc, float i)
+                                            { return acc + i * i; }));
 
         f.at(0) /= e;
         f.at(1) /= e;

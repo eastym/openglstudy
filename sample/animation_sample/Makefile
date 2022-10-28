@@ -1,12 +1,12 @@
 CC = g++
 
-CFLAGS =  -Wall -Weffc++ -g -std=c++20
+CFLAGS = -g -std=c++20
 
 PROGRAM = animation
 
-LIBS =  -lglut -lGLU -lGL
+LIBS =  -lglut -lGLU -lGL -lglfw
 
-OBJS = animation.cpp display.cpp
+OBJS = animation.cpp display.cpp ../fps/fps.cpp
 
 ARG = animation
 

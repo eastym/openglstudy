@@ -1,6 +1,10 @@
 #pragma once
 
+#include <GL/gl.h>
 #include <GL/glut.h>
+//#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 
 
 #include <iostream>
@@ -12,10 +16,12 @@
 #include <numeric>
 #include <cmath>
 #include <algorithm>
+#include <random>
 
 #include <cstdint>
+#include <climits>
 
-// #include "../fps/fps.hpp"
+#include "../fps/fps.hpp"
 
 // 立方体
 class Solid
