@@ -1,4 +1,4 @@
-#include "fps.h"
+#include "fps.hpp"
 
 int main(int args,char *argv[])
 {
@@ -7,7 +7,7 @@ int main(int args,char *argv[])
 
     while (1)
     {
-        fps.GetFPS();
+        fps.GetFPS([](){});
 
     }
 }
